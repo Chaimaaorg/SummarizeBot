@@ -1,0 +1,27 @@
+---
+tools_library: !include tools.yml
+common: # yaml shared by agent and all tools (can be overwritten by passing explicitly to constructors)
+  llm: "mistral"
+  fast_llm: "mistral"
+  fast_llm_token_limit: 2500
+  max_token_length: 4096
+tools: # list of all tools available for the agent
+  - summarizer_tool
+action_plans: # list of all action plans available for the meta agent
+  '1':
+    name: ''
+    description: Launch summarization
+    actions:
+      - - summarizer_tool
+prompt_message: |-
+  Given the chat history and the user question, what action plan would be best to follow?
+  Remember to only put out the number of the action plan you want to follow.
+
+  User question: {input}
+system_context: |-
+  Your goal is to select the right action plan for the question of the user in the fastest way possible, given the chat history.
+
+  Action plans:
+  {action_plans}
+
+  Only reply with the number of the action plan you want to follow and nothing else. For example: "1", "2", "3", etc.

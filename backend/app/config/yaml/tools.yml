@@ -1,0 +1,25 @@
+ library:
+  summarizer_tool:
+    description: >-
+      Summarizer tool to reduce the length of a text to a few sentences.
+      Input is a long string, output is a short summary of the input.
+      {examples}
+    prompt_message: |-
+      You are an expert at analyzing and summarizing information. Given the following user-provided text:
+      "{{text}}"
+
+      Write a concise and well-structured summary in markdown format. Follow these principles:
+      - Be clear and to the point.
+      - Preserve key information and main ideas.
+      - Use bullet points or headings if necessary for readability.
+      - If the text references an appendix or additional information, include a reference to it (e.g., "See Appendix for details").
+      - Format the summary beautifully in markdown for readability (e.g., use headings, lists, bold, italic, etc.).
+
+      CONCISE SUMMARY:
+    prompt_inputs:
+      - name: examples
+        content: |-
+          Example Input: "This is a long text with a lot of information that needs to be summarized clearly and concisely."
+          Example Output: "This text contains a lot of information. The key points are summarized below."
+    system_context: ''
+    max_token_length: 4000
