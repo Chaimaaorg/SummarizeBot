@@ -7,7 +7,7 @@ from fastapi import FastAPI
 from fastapi_limiter import FastAPILimiter
 
 from app.config.settings import settings, yaml_configs
-from app.utils.config_loader import load_agent_config
+from app.utils.config_utils import load_agent_config
 from app.utils.fastapi_globals import  g
 
 @asynccontextmanager

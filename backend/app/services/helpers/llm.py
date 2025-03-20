@@ -35,20 +35,18 @@ def get_llm(
                 model="llama3.2:1b",
                 base_url="http://ollama:11434",
             )
+        case "azure-3.5":
+            if settings.OPENAI_API_BASE is None:
+                raise ValueError("OPENAI_API_BASE must be set to use Azure LLM")
+            return AzureChatOpenAI(
+                openai_api_base=settings.OPENAI_API_BASE,
+                openai_api_version="2023-03-15-preview",
+                deployment_name="rnd-gpt-35-turbo",
+                openai_api_key=api_key if api_key is not None else settings.OPENAI_API_KEY,
+                openai_api_type="azure",
+                streaming=True,
+            )
         case "gpt-3.5-turbo":
-            if settings.USE_AZURE:
-                if settings.AZURE_OPENAI_ENDPOINT is not None and settings.AZURE_OPENAI_API_KEY is not None:
-                    return AzureChatOpenAI(
-                        azure_endpoint=settings.AZURE_OPENAI_ENDPOINT,
-                        openai_api_version="2024-05-01-preview",
-                        deployment_name="",  # Set empty deployment name
-                        openai_api_key=settings.AZURE_OPENAI_API_KEY,
-                        openai_api_type="azure",
-                        streaming=True,
-                        openai_proxy=settings.HTTP_PROXY if settings.USE_PROXY else None,
-                    )
-                raise ValueError("AZURE_OPENAI_ENDPOINT and AZURE_OPENAI_API_KEY must be set to use Azure LLM")
-
             return ChatOpenAI(
                 temperature=0,
                 model_name="gpt-3.5-turbo",
@@ -56,7 +54,6 @@ def get_llm(
                 openai_api_key=api_key if api_key is not None else settings.OPENAI_API_KEY,
                 streaming=True,
             )
-
         case "gpt-4":
             return ChatOpenAI(
                 temperature=0,
@@ -65,30 +62,6 @@ def get_llm(
                 openai_api_key=api_key if api_key is not None else settings.OPENAI_API_KEY,
                 streaming=True,
             )
-
-        # TODO: fix get_num_tokens to allow gpt-4o to work with agentikit
-        case "gpt-4o":
-            if settings.USE_AZURE:
-                if settings.AZURE_OPENAI_ENDPOINT is not None and settings.AZURE_OPENAI_API_KEY is not None:
-                    return AzureChatOpenAI(
-                        azure_endpoint=settings.AZURE_OPENAI_ENDPOINT,
-                        openai_api_version="2024-05-01-preview",
-                        deployment_name="",  # Set empty deployment name
-                        openai_api_key=settings.AZURE_OPENAI_API_KEY,
-                        openai_api_type="azure",
-                        streaming=True,
-                        openai_proxy=settings.HTTP_PROXY if settings.USE_PROXY else None,
-                    )
-                raise ValueError("AZURE_OPENAI_ENDPOINT and AZURE_OPENAI_API_KEY must be set to use Azure LLM")
-
-            return ChatOpenAI(
-                temperature=0,
-                model_name="gpt-4o",
-                openai_organization=settings.OPENAI_ORGANIZATION,
-                openai_api_key=api_key if api_key is not None else settings.OPENAI_API_KEY,
-                streaming=True,
-            )
-
         # If an exact match is not confirmed, this last case will be used if provided
         case _:
             logger.warning(f"LLM {llm} not found, using default LLM")

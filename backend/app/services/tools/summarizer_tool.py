@@ -24,6 +24,7 @@ class SummarizerTool(ExtendedBaseTool):
     name = "summarizer_tool"
 
     summarize_prompt_template: PromptTemplate
+    text_input :  Optional[str] = ""
 
     @classmethod
     def from_config(
@@ -61,6 +62,8 @@ class SummarizerTool(ExtendedBaseTool):
                 template=prompt_template_message,
                 input_variables=["text"],
             ),
+            text_input=kwargs.get("text_input",""),
+
         )
 
     def _run(
@@ -84,11 +87,13 @@ class SummarizerTool(ExtendedBaseTool):
         )
         try:
             callbacks = run_manager.get_child() if run_manager else None
-            tool_input = ToolInputSchema.parse_raw(query)
-            tool_outputs = [f"{k}: {v}" for k, v in tool_input.intermediate_steps.items()]
+            input_text = self.text_input  
+            print("Input text",input_text)
             assert self.max_token_length is not None, "max_token_length must not be None"
-            if get_token_length(query) <= self.max_token_length:
-                docs = [Document(page_content=tool_output) for tool_output in tool_outputs]
+            print(get_token_length(input_text))
+            print(self.max_token_length)
+            if get_token_length(input_text) <= self.max_token_length:
+                docs = [Document(page_content=input_text)]
                 chain = load_summarize_chain(
                     self.llm,
                     chain_type="stuff",
@@ -100,7 +105,7 @@ class SummarizerTool(ExtendedBaseTool):
                     chunk_size=10,
                     chunk_overlap=0,
                 )
-                texts = [text for tool_output in tool_outputs for text in text_splitter.split_text(tool_output)]
+                texts = text_splitter.split_text(input_text)
                 docs = [Document(page_content=t) for t in texts]
                 chain = load_summarize_chain(
                     self.llm,
@@ -108,7 +113,7 @@ class SummarizerTool(ExtendedBaseTool):
                     map_prompt=self.summarize_prompt_template,
                     combine_prompt=self.summarize_prompt_template,
                 )
-            
+
             response = await chain.arun(
                 docs,
                 callbacks=callbacks,

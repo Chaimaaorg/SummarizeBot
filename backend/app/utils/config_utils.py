@@ -7,7 +7,7 @@ from opentelemetry.sdk.trace.export import ConsoleSpanExporter
 from app.config.settings import settings, yaml_configs
 from app.models.agent_model import ActionPlan, ActionPlans, AgentAndToolsConfig, AgentConfig
 from app.models.tool_model import PromptInput, ToolConfig, ToolsLibrary
-from app.utils.config import Config
+from app.utils.config_loader import Config
 from app.config.settings import settings
 
 def get_exporter(

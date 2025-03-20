@@ -6,7 +6,7 @@ from langchain.tools import BaseTool
 
 from app.services.tools.extended_base_tool import ExtendedBaseTool
 from app.services.tools.summarizer_tool import SummarizerTool
-from app.utils.config_loader import get_agent_config
+from app.utils.config_utils import get_agent_config
 
 
 def get_tools(tools: List[str],text : Optional[str]) -> List[BaseTool]:
@@ -36,7 +36,7 @@ def get_tools(tools: List[str],text : Optional[str]) -> List[BaseTool]:
         c.from_config(
             config=agent_config.tools_library.library[name],
             common_config=agent_config.common,
-            **({"query": text} if name == "summarizer_tool" else {}),
+            text_input=text if name == "summarizer_tool" else None,  
         )
         for name, c in all_tool_classes
         if name in agent_config.tools

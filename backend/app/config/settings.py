@@ -29,11 +29,6 @@ class Settings(BaseSettings):
         SECRET_KEY (str): Application's secret key for signing purposes.
         BACKEND_CORS_ORIGINS (list[str] | list[AnyHttpUrl]): Allowed origins for CORS.
         AGENT_CONFIG_PATH (str): Path to agent configuration file.
-        CM_KEYCLOAK_URL (str) : Keycloak server URL
-        CM_KEYCLOAK_REALM (str) : Keycloak realm name
-        CM_KEYCLOAK_ACTIVATED (bool) : Keycloak activation control
-        CM_KEYCLOAK_CLIENT_ID (str) : Keycloak client ID
-        CM_KEYCLOAK_CLIENT_SECRET (str) : Keycloak client secret
     """
 
     USE_AZURE: bool = False
@@ -76,12 +71,6 @@ class Settings(BaseSettings):
         raise ValueError(f"Invalid CORS origins format: {value}")
 
     AGENT_CONFIG_PATH: str = ""
-
-    CM_KEYCLOAK_URL: str = ""
-    CM_KEYCLOAK_REALM: str = ""
-    CM_KEYCLOAK_ACTIVATED: bool = False
-    CM_KEYCLOAK_CLIENT_ID: str = ""
-    CM_KEYCLOAK_CLIENT_SECRET: str = ""
 
     IS_TRACING_ACTIVATED : bool = False
     DT_API_URL : str = ""

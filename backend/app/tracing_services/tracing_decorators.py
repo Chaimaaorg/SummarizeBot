@@ -4,7 +4,7 @@ from opentelemetry import trace
 from opentelemetry.trace import SpanKind
 from app.utils.util_functions import calculate_price_for_tracing
 from app.tracing_services.tracing_context import tracing_context
-from app.utils.config_loader import get_agent_config
+from app.utils.config_utils import get_agent_config
 from app.services.helpers.llm import get_llm
 import json
 from typing import Any
@@ -20,15 +20,13 @@ def trace_summarization_tool(func):
         with tracer.start_as_current_span(self.__class__.__name__, context=parent_context) as span:
             logger.debug(f"Span Created: {span.name}, trace_id={span.context.trace_id}, span_id={span.context.span_id}")
             try:
-                model_name = get_llm(get_agent_config().common.llm, api_key="").model_name
+                # model_name = get_llm(get_agent_config().common.llm, api_key="")
                 result = await func(self, *args, **kwargs)
-                input_data = tracing_context.get_variable("input_docs_ctx")
-                formatted_input = json.dumps([msg.content for msg in input_data], ensure_ascii=False)
-                span.set_attribute("input", formatted_input)
+                input_data = self.text_input
+                span.set_attribute("input", input_data)
                 span.set_attribute("output", result)
-                pricing = calculate_price_for_tracing(model_name, formatted_input, result)
-                span.set_attribute("pricing", json.dumps(pricing,ensure_ascii=False))
-                tracing_context.clear_variable("input_docs_ctx")
+                # pricing = calculate_price_for_tracing(model_name, input_data, result)
+                # span.set_attribute("pricing", json.dumps(pricing,ensure_ascii=False))
                 return result
 
             except Exception as e:
@@ -51,7 +49,7 @@ def trace_llm_tool_creation(func):
                 llm, tools = kwargs["llm"], kwargs["tools"]
                 span.set_attributes({
                     "llm.class": llm.__class__.__name__,
-                    "llm.name": llm.model_name,
+                    "llm.name": str(llm),
                     "tools.count": len(tools),
                     "tools.names": ", ".join(type(tool).__name__ for tool in tools),
                     "prompt.message": kwargs["prompt_message"],

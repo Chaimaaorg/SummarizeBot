@@ -12,7 +12,7 @@ from app.models.tool_model import LLMType
 from app.services.helpers.llm import get_llm
 from app.services.router_agent.SimpleRouterAgent import SimpleRouterAgent
 from app.config.tools_loader import get_tools
-from app.utils.config_loader import get_agent_config
+from app.utils.config_utils import get_agent_config
 
 
 def get_conv_token_buffer_memory(
@@ -109,7 +109,7 @@ def create_meta_agent(
     return AgentExecutor.from_agent_and_tools(
         agent=simple_router_agent,
         tools=tools,
-        # verbose=True,
+        verbose=True,
         max_iterations=15,
         # max_execution_time=30,
         early_stopping_method="force",
